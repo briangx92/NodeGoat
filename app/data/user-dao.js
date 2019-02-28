@@ -22,13 +22,23 @@ function UserDAO(db) {
             firstName: firstName,
             lastName: lastName,
             benefitStartDate: this.getRandomFutureDate(),
-            password: password //received from request param
+            password: bcrypt.hashSync(password, bcrypt.genSaltSync()) //received from request param
             /*
             // Fix for A2-1 - Broken Auth
             // Stores password  in a safer way using one way encryption and salt hashing
-            password: bcrypt.hashSync(password, bcrypt.genSaltSync())
+            password: 
             */
         };
+
+        // Generate password hash
+        var salt = bcrypt.genSaltSync();
+        var passwordHash = bcrypt.hashSync(password, salt);
+        if (bcrypt.compareSync(password, user.password)) {
+            callback(null, user);
+        } else {
+            callback(invalidPasswordError, null);
+        }
+
 
         // Add email if set
         if (email !== "") {
