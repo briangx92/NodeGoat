@@ -1,5 +1,5 @@
 "use strict";
-var cookieParser = require("cookie-parser")
+var cookieParser = require("cookie-parser");
 var express = require("express");
 var favicon = require("serve-favicon");
 var bodyParser = require("body-parser");
@@ -81,10 +81,10 @@ MongoClient.connect(config.db, function(err, db) {
         // genid: function(req) {
         //    return genuuid() // use UUIDs for session IDs
         //},
-        secret: config.cookieSecret,
+        // secret: config.cookieSecret,
         // Both mandatory in Express v4
         saveUninitialized: true,
-        resave: true
+        resave: true,
         /*
         // Fix for A5 - Security MisConfig
         // Use generic cookie name
@@ -95,7 +95,8 @@ MongoClient.connect(config.db, function(err, db) {
         // TODO: Add "maxAge"
         cookie: {
             httpOnly: true,
-            add maxAge: 30 * 1000
+            maxAge: 30 * 1000,
+            secure: true
 
             // Remember to start an HTTPS server to get this working
             // secure: true
@@ -132,10 +133,9 @@ MongoClient.connect(config.db, function(err, db) {
     routes(app, db);
 
     // Template system setup
-    swig.init({
+    swig.setDefaults({
         // Autoescape disabled
         // autoescape: false
-        
         // Fix for A3 - XSS, enable auto escaping
         autoescape: true // default value
         
