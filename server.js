@@ -1,5 +1,5 @@
 "use strict";
-
+var cookieParser = require("cookie-parser")
 var express = require("express");
 var favicon = require("serve-favicon");
 var bodyParser = require("body-parser");
@@ -91,15 +91,15 @@ MongoClient.connect(config.db, function(err, db) {
         key: "sessionId",
         */
 
-        /*
         // Fix for A3 - XSS
         // TODO: Add "maxAge"
         cookie: {
-            httpOnly: true
+            httpOnly: true,
+            add maxAge: 30 * 1000
+
             // Remember to start an HTTPS server to get this working
             // secure: true
         }
-        */
 
     }));
 
@@ -132,13 +132,13 @@ MongoClient.connect(config.db, function(err, db) {
     routes(app, db);
 
     // Template system setup
-    swig.setDefaults({
+    swig.init({
         // Autoescape disabled
-        autoescape: false
-        /*
+        // autoescape: false
+        
         // Fix for A3 - XSS, enable auto escaping
         autoescape: true // default value
-        */
+        
     });
 
     // Insecure HTTP connection

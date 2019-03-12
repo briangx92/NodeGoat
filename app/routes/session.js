@@ -61,26 +61,26 @@ function SessionHandler(db) {
             var invalidPasswordErrorMessage = "Invalid password";
             if (err) {
                 if (err.noSuchUser) {
-                    console.log("Error: attempt to login with invalid user: ", userName);
+                    console.log('Error: attempt to login with invalid user: ', userName);
 
                     // Fix for A1 - 3 Log Injection - encode/sanitize input for CRLF Injection
                     // that could result in log forging:
                     // - Step 1: Require a module that supports encoding
-                    var ESAPI = require("node-esapi");
+                    // var ESAPI = require('node-esapi');
                     // - Step 2: Encode the user input that will be logged in the correct context
                     // following are a few examples:
-                    console.log("Error: attempt to login with invalid user: %s", ESAPI.encoder().encodeForHTML(userName));
-                    console.log("Error: attempt to login with invalid user: %s', ESAPI.encoder().encodeForJavaScript(userName)");
-                    console.log("Error: attempt to login with invalid user: %s", ESAPI.encoder().encodeForURL(userName));
+                    // console.log('Error: attempt to login with invalid user: %s', ESAPI.encoder().encodeForHTML(userName));
+                    // console.log('Error: attempt to login with invalid user: %s', ESAPI.encoder().encodeForJavaScript(userName));
+                    // console.log('Error: attempt to login with invalid user: %s', ESAPI.encoder().encodeForURL(userName));
                     // or if you know that this is a CRLF vulnerability you can target this specifically as follows:
-                    console.log("Error: attempt to login with invalid user: %s", userName.replace("/(\r\n|\r|\n)/g", '_'));
+                    // console.log('Error: attempt to login with invalid user: %s', userName.replace(/(\r\n|\r|\n)/g, '_'));
 
                     return res.render("login", {
                         userName: userName,
                         password: "",
                         loginError: invalidUserNameErrorMessage
                         //Fix for A2-2 Broken Auth - Uses identical error for both username, password error
-                        loginError: errorMessage
+                        // loginError: errorMessage
                     });
                 } else if (err.invalidPassword) {
                     return res.render("login", {
@@ -88,7 +88,7 @@ function SessionHandler(db) {
                         password: "",
                         loginError: invalidPasswordErrorMessage
                         //Fix for A2-2 Broken Auth - Uses identical error for both username, password error
-                        loginError: errorMessage
+                        // loginError: errorMessage
 
                     });
                 } else {
@@ -107,26 +107,23 @@ function SessionHandler(db) {
             // Fix the problem by regenerating a session in each login
             // by wrapping the below code as a function callback for the method req.session.regenerate()
             // i.e:
-            // `req.session.regenerate(function() {})`
+            req.session.regenerate(function(){
             req.session.userId = user._id;
             if (user.isAdmin) {
               return res.redirect("/benefits");
             } else {
               return res.redirect("/dashboard");
             }
-        };);
-    }
+        });
+    };
 
     this.displayLogoutPage = function(req, res, next) {
-        "use strict";
         req.session.destroy(function() {
-
             res.redirect("/");
         });
     };
 
     this.displaySignupPage = function(req, res, next) {
-        "use strict";
         res.render("signup", {
             userName: "",
             password: "",
@@ -139,18 +136,17 @@ function SessionHandler(db) {
     };
 
     function validateSignup(userName, firstName, lastName, password, verify, email, errors) {
-        "use strict";
 
         var USER_RE = /^.{1,20}$/;
         var FNAME_RE = /^.{1,100}$/;
         var LNAME_RE = /^.{1,100}$/;
         var EMAIL_RE = /^[\S]+@[\S]+\.[\S]+$/;
         var PASS_RE = /^.{1,20}$/;
-        
+        /*
         //Fix for A2-2 - Broken Authentication -  requires stronger password
         //(at least 8 characters with numbers and both lowercase and uppercase letters.)
         var PASS_RE =/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
-        
+        */
 
         errors.userNameError = "";
         errors.firstNameError = "";
@@ -191,7 +187,6 @@ function SessionHandler(db) {
     }
 
     this.handleSignup = function(req, res, next) {
-        "use strict";
 
         var email = req.body.email;
         var userName = req.body.userName;
@@ -225,9 +220,7 @@ function SessionHandler(db) {
                     prepareUserData(user, next);
                     /*
                     sessionDAO.startSession(user._id, function(err, sessionId) {
-
                         if (err) return next(err);
-
                         res.cookie("session", sessionId);
                         req.session.userId = user._id;
                         return res.render("dashboard", user);
@@ -236,7 +229,7 @@ function SessionHandler(db) {
                     req.session.regenerate(function() {
                         req.session.userId = user._id;
                         // Set userId property. Required for left nav menu links
-                        user.userId = req.user._id;
+                        user.userId = user._id;
 
                         return res.render("dashboard", user);
                     });
@@ -250,7 +243,6 @@ function SessionHandler(db) {
     };
 
     this.displayWelcomePage = function(req, res, next) {
-        "use strict";
         var userId;
 
         if (!req.session.userId) {
