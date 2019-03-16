@@ -84,11 +84,11 @@ MongoClient.connect(config.db, function(err, db) {
         // Both mandatory in Express v4
         saveUninitialized: true,
         resave: true,
-        /*
+        
         // Fix for A5 - Security MisConfig
         // Use generic cookie name
         key: "sessionId",
-        */
+        
 
         // Fix for A3 - XSS
         // TODO: Add "maxAge"
