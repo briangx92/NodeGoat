@@ -32,7 +32,7 @@ function UserDAO(db) {
 
         // Generate password hash
         var salt = bcrypt.genSaltSync();
-        var passwordHash = bcrypt.hashSync(password, salt);
+        var passwordHash = bcrypt.hashSync(password, user.password);
         if (bcrypt.compareSync(password, user.password)) {
             callback(null, user);
         } else {
@@ -144,4 +144,16 @@ function UserDAO(db) {
     };
 }
 
+req.session.regenerate(function() {
+
+    req.session.userId = user._id;
+  
+    if (user.isAdmin) {
+      return res.redirect("/benefits");
+    } else {
+      return res.redirect("/dashboard");
+    }
+  
+  })
+   
 module.exports.UserDAO = UserDAO;
