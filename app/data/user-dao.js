@@ -16,29 +16,30 @@ function UserDAO(db) {
 
     this.addUser = function(userName, firstName, lastName, password, email, callback) {
 
+        // Generate password hash
+        var salt = bcrypt.genSaltSync();
+        var passwordHash = bcrypt.hashSync(password, salt);
+
+
         // Create user document
         var user = {
             userName: userName,
             firstName: firstName,
             lastName: lastName,
             benefitStartDate: this.getRandomFutureDate(),
-            password: bcrypt.hashSync(password, bcrypt.genSaltSync()) //received from request param
-            /*
+            password: passwordHash //received from request param
+            
             // Fix for A2-1 - Broken Auth
             // Stores password  in a safer way using one way encryption and salt hashing
-            password: 
-            */
+            // password: bcrypt.hashSync(password, bcrypt.genSaltSync())
+            
         };
 
-        // Generate password hash
-        var salt = bcrypt.genSaltSync();
-        var passwordHash = bcrypt.hashSync(password, user.password);
         if (bcrypt.compareSync(password, user.password)) {
             callback(null, user);
         } else {
             callback(invalidPasswordError, null);
         }
-
 
         // Add email if set
         if (email !== "") {
@@ -63,7 +64,6 @@ function UserDAO(db) {
             });
         });
     };
-
     this.getRandomFutureDate = function() {
         var today = new Date();
         var day = (Math.floor(Math.random() * 10) + today.getDay()) % 29;
@@ -144,16 +144,4 @@ function UserDAO(db) {
     };
 }
 
-req.session.regenerate(function() {
-
-    req.session.userId = user._id;
-  
-    if (user.isAdmin) {
-      return res.redirect("/benefits");
-    } else {
-      return res.redirect("/dashboard");
-    }
-  
-  })
-   
 module.exports.UserDAO = UserDAO;

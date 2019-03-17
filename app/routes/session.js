@@ -65,7 +65,7 @@ function SessionHandler(db) {
 
                     // Fix for A1 - 3 Log Injection - encode/sanitize input for CRLF Injection
                     // that could result in log forging:
-                    // Step 1: Require a module that supports encoding
+                    // - Step 1: Require a module that supports encoding
                     var ESAPI = require('node-esapi');
                     // - Step 2: Encode the user input that will be logged in the correct context
                     // following are a few examples:
@@ -114,6 +114,33 @@ function SessionHandler(db) {
             } else {
               return res.redirect("/dashboard");
             }
+            req.session.destroy(function() {
+                res.redirect("/");
+            });
+
+            req.session.regenerate(function() {
+
+                req.session.userId = user._id;
+              
+                if (user.isAdmin) {
+                  return res.redirect("/benefits");
+                } else {
+                  return res.redirect("/dashboard");
+                }
+              
+              })
+                
+            // Enable session management using express middleware
+            app.use(express.cookieParser());
+            app.use(express.session({
+                secret: "s3Cur3",
+                cookie: {
+                    httpOnly: true,
+                    secure: true
+                }
+            }));
+                
+
         });
     };
 
@@ -169,8 +196,8 @@ function SessionHandler(db) {
             return false;
         }
         if (!PASS_RE.test(password)) {
-            errors.passwordError = "Password must be at least 8 characters " +
-                " including numbers, symbols, lowercase and uppercase letters.";
+            errors.passwordError = "Password must be 8 to 18 characters" +
+                " including numbers, lowercase and uppercase letters.";
             return false;
         }
         if (password !== verify) {
