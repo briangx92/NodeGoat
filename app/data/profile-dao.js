@@ -18,6 +18,13 @@ function ProfileDAO(db) {
     var crypto = require("crypto");
     var config = require("../../config/config");
 
+    //Set keys config object
+    var config = {
+        cryptoKey: "a_secure_key_for_crypto_here",
+        cryptoAlgo: "aes256", // or other secure encryption algo here
+        iv: ""
+    };
+
     /// Helper method create initialization vector
     // By default the initialization vector is not secure enough, so we create our own
     var createIV = function() {
