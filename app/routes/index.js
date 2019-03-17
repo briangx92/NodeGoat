@@ -12,7 +12,7 @@ var exports = function(app, db) {
 
     "use strict";
 
-    var sessionHandler = new SessionHandler(db);
+    var sessionHandler = require("./session");
     var profileHandler = new ProfileHandler(db);
     var benefitsHandler = new BenefitsHandler(db);
     var contributionsHandler = new ContributionsHandler(db);
@@ -22,6 +22,7 @@ var exports = function(app, db) {
 
     // Middleware to check if a user is logged in
     var isLoggedIn = sessionHandler.isLoggedInMiddleware;
+    
 
     //Middleware to check if user has admin rights
     var isAdmin = sessionHandler.isAdminUserMiddleware;
@@ -52,12 +53,12 @@ var exports = function(app, db) {
     app.post("/contributions", isLoggedIn, contributionsHandler.handleContributionsUpdate);
 
     // Benefits Page
-    app.get("/benefits", isLoggedIn, benefitsHandler.displayBenefits);
-    app.post("/benefits", isLoggedIn, benefitsHandler.updateBenefits);
-    /* Fix for A7 - checks user role to implement  Function Level Access Control
+    // app.get("/benefits", isLoggedIn, benefitsHandler.displayBenefits);
+    // app.post("/benefits", isLoggedIn, benefitsHandler.updateBenefits);
+    // Fix for A7 - checks user role to implement  Function Level Access Control
      app.get("/benefits", isLoggedIn, isAdmin, benefitsHandler.displayBenefits);
      app.post("/benefits", isLoggedIn, isAdmin, benefitsHandler.updateBenefits);
-     */
+     
 
     // Allocations Page
     app.get("/allocations/:userId", isLoggedIn, allocationsHandler.displayAllocations);
