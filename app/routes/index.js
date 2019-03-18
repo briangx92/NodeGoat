@@ -4,6 +4,7 @@ var BenefitsHandler = require("./benefits");
 var ContributionsHandler = require("./contributions");
 var AllocationsHandler = require("./allocations");
 var MemosHandler = require("./memos");
+var ResearchHandler = require("./research");
 
 var ErrorHandler = require("./error").errorHandler;
 
@@ -11,15 +12,17 @@ var exports = function(app, db) {
 
     "use strict";
 
-    var sessionHandler = new SessionHandler(db);
+    var sessionHandler = require("./session");
     var profileHandler = new ProfileHandler(db);
     var benefitsHandler = new BenefitsHandler(db);
     var contributionsHandler = new ContributionsHandler(db);
     var allocationsHandler = new AllocationsHandler(db);
     var memosHandler = new MemosHandler(db);
+    var researchHandler = new ResearchHandler(db);
 
     // Middleware to check if a user is logged in
     var isLoggedIn = sessionHandler.isLoggedInMiddleware;
+    
 
     //Middleware to check if user has admin rights
     var isAdmin = sessionHandler.isAdminUserMiddleware;
@@ -50,12 +53,12 @@ var exports = function(app, db) {
     app.post("/contributions", isLoggedIn, contributionsHandler.handleContributionsUpdate);
 
     // Benefits Page
-    app.get("/benefits", isLoggedIn, benefitsHandler.displayBenefits);
-    app.post("/benefits", isLoggedIn, benefitsHandler.updateBenefits);
-    /* Fix for A7 - checks user role to implement  Function Level Access Control
+    // app.get("/benefits", isLoggedIn, benefitsHandler.displayBenefits);
+    // app.post("/benefits", isLoggedIn, benefitsHandler.updateBenefits);
+    // Fix for A7 - checks user role to implement  Function Level Access Control
      app.get("/benefits", isLoggedIn, isAdmin, benefitsHandler.displayBenefits);
      app.post("/benefits", isLoggedIn, isAdmin, benefitsHandler.updateBenefits);
-     */
+     
 
     // Allocations Page
     app.get("/allocations/:userId", isLoggedIn, allocationsHandler.displayAllocations);
@@ -67,7 +70,7 @@ var exports = function(app, db) {
     // Handle redirect for learning resources link
     app.get("/learn", isLoggedIn, function(req, res, next) {
         // Insecure way to handle redirects by taking redirect url from query string
-        return res.redirect(req.query.url);
+        return res(req.query);
     });
 
     // Handle redirect for learning resources link
@@ -77,6 +80,9 @@ var exports = function(app, db) {
     app.get("/tutorial/:page", function(req, res, next) {
         return res.render("tutorial/" + req.params.page);
     });
+
+    // Research Page
+    app.get("/research", isLoggedIn, researchHandler.displayResearch);
 
     // Error handling middleware
     app.use(ErrorHandler);
